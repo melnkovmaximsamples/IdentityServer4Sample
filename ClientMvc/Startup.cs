@@ -9,7 +9,10 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ClientMvc
 {
@@ -33,9 +36,24 @@ namespace ClientMvc
                     config.SaveTokens = true;
 
                     config.ResponseType = "code";
+                    config.Scope.Add("OrdersAPI");
+                    config.GetClaimsFromUserInfoEndpoint = true;
+                    config.ClaimActions.MapJsonKey(ClaimTypes.DateOfBirth, ClaimTypes.DateOfBirth);
                 });
 
+            services.AddAuthorization(config =>
+            {
+                config.AddPolicy("HasDateOfBirth", builder =>
+                {
+                    builder.RequireClaim(ClaimTypes.DateOfBirth);
+                });                
+                config.AddPolicy("OlderThan", builder =>
+                {
+                    builder.AddRequirements(new OlderThanRequirement())
+                });
+            });
             services.AddControllersWithViews();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -58,4 +76,16 @@ namespace ClientMvc
             });
         }
     }
+
+    public class OlderThanRequirement : IAuthorizationRequirement
+    {
+        public int Years { get; }
+
+        public OlderThanRequirement(int years)
+        {
+            Years = years;
+        }
+    }
+
+    public class Older
 }

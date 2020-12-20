@@ -35,8 +35,11 @@ namespace IdentityServerSample
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile
                 },
-
-                RedirectUris = { "https://localhost:13334/signin-oidc"}
+                RequirePkce = true,
+                AllowAccessTokensViaBrowser = false,
+                RedirectUris = { "https://localhost:13334/signin-oidc"},
+                RequireConsent = false
+                //AlwaysIncludeUserClaimsInIdToken = true
             }
         };
 

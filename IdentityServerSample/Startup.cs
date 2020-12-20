@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServerSample.Infrastructure;
 
 namespace IdentityServerSample
 {
@@ -43,11 +44,13 @@ namespace IdentityServerSample
                 .AddInMemoryApiResources(Configuration.GetApiResources())
                 .AddInMemoryIdentityResources(Configuration.GetIdentityResources())
                 .AddInMemoryApiScopes(Configuration.GetApiScopes())
+                .AddProfileService<ProfileService>()
                 .AddDeveloperSigningCredential();
 
 
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
