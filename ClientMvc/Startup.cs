@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace OrdersApi
+namespace ClientMvc
 {
     public class Startup
     {
@@ -18,20 +19,22 @@ namespace OrdersApi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, config => 
+            services.AddAuthentication(config => 
+            {
+                config.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                config.DefaultChallengeScheme = "oidc";
+            })
+                .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddOpenIdConnect("oidc", config =>
                 {
-                    config.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ClockSkew = TimeSpan.FromSeconds(5),
-                        ValidateAudience = false
-                    };
-
                     config.Authority = "https://localhost:15554";
-                    config.Audience = "OrdersAPI";
+                    config.ClientId = "client_id_mvc";
+                    config.ClientSecret = "client_secret_mvc";
+                    config.SaveTokens = true;
+
+                    config.ResponseType = "code";
                 });
 
-            services.AddAuthorization();
             services.AddControllersWithViews();
         }
 

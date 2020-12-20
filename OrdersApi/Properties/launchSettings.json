@@ -1,14 +1,24 @@
-﻿{
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/",
+      "sslPort": 0
+    },
+    "iisExpress": {
+      "applicationUrl": "http://localhost:5001/",
+      "sslPort": 0
+    }
+  },
   "profiles": {
     "OrdersApi": {
       "commandName": "Project",
-      "launchBrowser": true,
       "launchUrl": "site/index",
-      "applicationUrl": "https://localhost:5001;http://localhost:5000",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "applicationUrl": "https://localhost:11110;http://localhost:11111"
     }
   }
 }
-

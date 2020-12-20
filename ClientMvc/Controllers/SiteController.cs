@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace OrdersApi.Controllers
+namespace ClientMvc.Controllers
 {
     [Route("[controller]")]
     public class SiteController : Controller
@@ -16,12 +16,12 @@ namespace OrdersApi.Controllers
         {
             return View();
         }
-        
+
         [Authorize]
         [Route("[action]")]
-        public string Secret()
+        public IActionResult Secret()
         {
-            return "Secret string from Orders API";
+            return View();
         }
     }
 }

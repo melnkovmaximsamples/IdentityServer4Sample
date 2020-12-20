@@ -2,7 +2,7 @@
 
 <partial name="_Menu"/>
 
-@if(string.IsNullOrEmpty(ViewData["Message"].ToString()))
+@if(!string.IsNullOrEmpty(ViewData["Message"].ToString()))
 {
     <p>
         @ViewData["Message"]

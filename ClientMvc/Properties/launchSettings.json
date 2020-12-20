@@ -3,23 +3,23 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iis": {
-      "applicationUrl": "http://localhost/UsersApi",
+      "applicationUrl": "http://localhost/",
       "sslPort": 0
     },
     "iisExpress": {
-      "applicationUrl": "http://localhost:10001/",
+      "applicationUrl": "http://localhost:5001/",
       "sslPort": 0
     }
   },
   "profiles": {
-    "UsersApi": {
+    "ClientMvc": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "site/index",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "http://localhost:10001"
+      "applicationUrl": "https://localhost:13334;http://localhost:13333"
     }
   }
 }
