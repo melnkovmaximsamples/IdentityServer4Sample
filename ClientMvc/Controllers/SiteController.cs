@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Authorization.Client.Mvc.ViewModels;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Authentication;
 
 namespace ClientMvc.Controllers
@@ -41,9 +42,29 @@ namespace ClientMvc.Controllers
             {
                 var client = _httpClientFactory.CreateClient();
 
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", model.AccessToken);
+                // заменили на
+                // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", model.AccessToken);
+                // на это
+                client.SetBearerToken(model.AccessToken);
 
                 var result = await client.GetStringAsync("http://localhost:11111/site/secret");
+                var refreshClient = _httpClientFactory.CreateClient();
+                var parameters = new Dictionary<string, string>()
+                {
+                    ["refresh_token"] = model.RefreshToken,
+                    ["grant_type"] = "refresh_token"
+                };
+
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://localhost:15554/connect/token")
+                {
+                    Content = new FormUrlEncodedContent(parameters)
+                };
+
+                var ;
+                request.Headers.Add("Authorization", $"Bearer {encodedData}");
+
+                var response = await refreshClient.GetAsync(request);
+                
                 
                 ViewBag.Message = result;
             }
@@ -57,20 +78,20 @@ namespace ClientMvc.Controllers
         
         [Authorize(Policy = "HasDateOfBirth")]
         [Route("[action]")]
-        public async Task<IActionResult> Secret1()
+        public IActionResult Secret1()
         {
             var model = new ClaimManager(HttpContext, User);
 
-            return View(model);
+            return View("Secret", model);
         }
 
-        [Authorize(Policy = "OlderThan10")]
+        [Authorize(Policy = "OlderThan")]
         [Route("[action]")]
-        public async Task<IActionResult> Secret2()
+        public IActionResult Secret2()
         {
             var model = new ClaimManager(HttpContext, User);
 
-            return View(model);
+            return View("Secret", model);
         }
     }
 }

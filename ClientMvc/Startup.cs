@@ -8,11 +8,13 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.Options;
 
 namespace ClientMvc
 {
@@ -22,7 +24,7 @@ namespace ClientMvc
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAuthentication(config => 
+            services.AddAuthentication(config =>
             {
                 config.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 config.DefaultChallengeScheme = "oidc";
@@ -37,6 +39,7 @@ namespace ClientMvc
 
                     config.ResponseType = "code";
                     config.Scope.Add("OrdersAPI");
+                    config.Scope.Add("offline_access");
                     config.GetClaimsFromUserInfoEndpoint = true;
                     config.ClaimActions.MapJsonKey(ClaimTypes.DateOfBirth, ClaimTypes.DateOfBirth);
                 });
@@ -46,12 +49,14 @@ namespace ClientMvc
                 config.AddPolicy("HasDateOfBirth", builder =>
                 {
                     builder.RequireClaim(ClaimTypes.DateOfBirth);
-                });                
-                config.AddPolicy("OlderThan", builder =>
-                {
-                    builder.AddRequirements(new OlderThanRequirement())
                 });
+                //config.AddPolicy("OlderThan", builder =>
+                //{
+                //    builder.AddRequirements(new OlderThanRequirement(10));
+                //});
             });
+            services.AddSingleton<IAuthorizationHandler, OlderThanRequirementHandler>();
+            services.AddSingleton<IAuthorizationPolicyProvider, CustomAuthorizationPolicyProvider>();
             services.AddControllersWithViews();
             services.AddHttpClient();
         }
@@ -77,6 +82,32 @@ namespace ClientMvc
         }
     }
 
+    public class CustomAuthorizationPolicyProvider : DefaultAuthorizationPolicyProvider
+    {
+        private readonly AuthorizationOptions _options;
+
+        public CustomAuthorizationPolicyProvider(IOptions<AuthorizationOptions> options) : base(options)
+        {
+            _options = options.Value;
+        }
+
+        public override async Task<AuthorizationPolicy> GetPolicyAsync(string policyName)
+        {
+            var policyExists = await base.GetPolicyAsync(policyName);
+
+            if (policyExists == null)
+            {
+                policyExists = new AuthorizationPolicyBuilder()
+                    .AddRequirements(new OlderThanRequirement(10))
+                    .Build();
+
+                _options.AddPolicy(policyName, policyExists);
+            }
+
+            return policyExists;
+        }
+    }
+
     public class OlderThanRequirement : IAuthorizationRequirement
     {
         public int Years { get; }
@@ -87,5 +118,27 @@ namespace ClientMvc
         }
     }
 
-    public class Older
+    public class OlderThanRequirementHandler : AuthorizationHandler<OlderThanRequirement>
+    {
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OlderThanRequirement requirement)
+        {
+            var hasClaim = context.User.HasClaim(x => x.Type == ClaimTypes.DateOfBirth);
+
+            if (!hasClaim)
+            {
+                return Task.CompletedTask;
+            }
+
+            var dateOfBirth = context.User.FindFirst(x => x.Type == ClaimTypes.DateOfBirth).Value;
+            var date = DateTime.Parse(dateOfBirth, new CultureInfo("ru-RU"));
+            var canEnter = DateTime.Now.Year - date.Year >= 10;
+
+            if (canEnter)
+            {
+                context.Succeed(requirement);
+            }
+
+            return Task.CompletedTask;
+        }
+    }
 }

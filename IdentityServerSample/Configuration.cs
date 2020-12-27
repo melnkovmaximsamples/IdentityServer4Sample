@@ -38,7 +38,9 @@ namespace IdentityServerSample
                 RequirePkce = true,
                 AllowAccessTokensViaBrowser = false,
                 RedirectUris = { "https://localhost:13334/signin-oidc"},
-                RequireConsent = false
+                RequireConsent = false,
+                AccessTokenLifetime = 5,
+                AllowOfflineAccess = true
                 //AlwaysIncludeUserClaimsInIdToken = true
             }
         };
