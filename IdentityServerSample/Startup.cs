@@ -34,11 +34,19 @@ namespace IdentityServerSample
                     config.Password.RequiredLength = 6;
                 })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            
-            services.AddIdentityServer(options => 
+
+            services.ConfigureApplicationCookie(config =>
             {
-                options.UserInteraction.LoginUrl = "/Auth/Login";
-            })
+                config.LoginPath = "/Auth/Login";
+                config.LogoutPath = "/Auth/Logout";
+                config.Cookie.Name = "IdentityServer.Cookies";
+            });
+            
+            services.AddIdentityServer()
+            //        options => 
+            //{
+            //    options.UserInteraction.LoginUrl = "/Auth/Login";
+            //})
                 .AddAspNetIdentity<IdentityUser>()
                 .AddInMemoryClients(Configuration.GetClients())
                 .AddInMemoryApiResources(Configuration.GetApiResources())

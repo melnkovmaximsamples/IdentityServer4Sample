@@ -38,6 +38,7 @@ namespace IdentityServerSample
                 RequirePkce = true,
                 AllowAccessTokensViaBrowser = false,
                 RedirectUris = { "https://localhost:13334/signin-oidc"},
+                PostLogoutRedirectUris = { "https://localhost:13334/signout-callback-oidc" },
                 RequireConsent = false,
                 AccessTokenLifetime = 5,
                 AllowOfflineAccess = true
