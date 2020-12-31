@@ -44,7 +44,7 @@ namespace IdentityServerSample.Controllers
                 return RedirectToAction("Index", "Server");
             }
 
-            return View(logoutResult.PostLogoutRedirectUri);
+            return Redirect(logoutResult.PostLogoutRedirectUri);
         }
 
         [Route("[action]")]

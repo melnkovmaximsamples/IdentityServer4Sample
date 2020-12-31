@@ -15,7 +15,6 @@
     "ClientMvc": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "site/index",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

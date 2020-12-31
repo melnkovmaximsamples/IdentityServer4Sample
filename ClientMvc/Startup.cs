@@ -58,8 +58,8 @@ namespace ClientMvc
             });
             services.AddSingleton<IAuthorizationHandler, OlderThanRequirementHandler>();
             services.AddSingleton<IAuthorizationPolicyProvider, CustomAuthorizationPolicyProvider>();
-            services.AddControllersWithViews();
             services.AddHttpClient();
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -69,7 +69,7 @@ namespace ClientMvc
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthentication();
@@ -78,7 +78,9 @@ namespace ClientMvc
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(name:"Default", pattern:"{controller=Site}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Site}/{action=Index}/{id?}");
             });
         }
     }

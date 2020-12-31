@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 
 namespace ClientMvc.Controllers
 {
-    [Route("[controller]")]
     public class SiteController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -27,7 +26,6 @@ namespace ClientMvc.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        [Route("[action]")]
         public IActionResult Index()
         {
             return View();
@@ -35,7 +33,6 @@ namespace ClientMvc.Controllers
 
         // проблема. работает только при audience отключенном. т.к. на добавляется в access_token "OrdersAPI" в aud.
         [Authorize]
-        [Route("[action]")]
         public async Task<IActionResult> Secret()
         {
             var model = new ClaimManager(HttpContext, User);
@@ -110,7 +107,12 @@ namespace ClientMvc.Controllers
         [Route("[action]")]
         public IActionResult Logout()
         {
+            var parameters = new AuthenticationProperties()
+            {
+                RedirectUri = "/Site/Secret"
+            };
             return SignOut(
+                parameters,
                 CookieAuthenticationDefaults.AuthenticationScheme,
                 OpenIdConnectDefaults.AuthenticationScheme);
         }
